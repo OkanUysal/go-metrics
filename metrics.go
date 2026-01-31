@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"context"
 	"net/http"
 	"sync"
 	"time"
@@ -65,6 +66,11 @@ func NewMetrics(config *Config) *Metrics {
 	// Initialize HTTP metrics if enabled
 	if config.EnableHTTPMetrics {
 		m.initHTTPMetrics()
+	}
+
+	// Start Grafana Cloud push if configured
+	if config.GrafanaCloudURL != "" && config.GrafanaCloudAPIKey != "" {
+		m.StartGrafanaPush(context.Background())
 	}
 
 	return m
