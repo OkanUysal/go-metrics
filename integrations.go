@@ -122,12 +122,12 @@ func (dm *DatabaseMetrics) QueryExecuted(operation string, duration float64, suc
 	if !success {
 		status = "error"
 	}
-	
+
 	dm.m.RecordHistogram("database_query_duration_seconds", duration, MetricLabels{
 		"operation": operation,
 		"status":    status,
 	})
-	
+
 	dm.m.IncrementCounter("database_queries_total", MetricLabels{
 		"operation": operation,
 		"status":    status,
@@ -186,7 +186,7 @@ func (bm *BusinessMetrics) MatchCompleted(matchType string, duration float64) {
 	bm.m.IncrementCounter("matches_completed_total", MetricLabels{
 		"type": matchType,
 	})
-	
+
 	bm.m.RecordHistogram("match_duration_seconds", duration, MetricLabels{
 		"type": matchType,
 	})

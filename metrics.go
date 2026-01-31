@@ -12,15 +12,15 @@ import (
 type Metrics struct {
 	config   *Config
 	registry *prometheus.Registry
-	
+
 	// HTTP metrics
 	httpMetrics *HTTPMetrics
-	
+
 	// Custom metrics storage
 	counters   map[string]*prometheus.CounterVec
 	gauges     map[string]*prometheus.GaugeVec
 	histograms map[string]*prometheus.HistogramVec
-	
+
 	mu sync.RWMutex
 }
 
@@ -29,9 +29,9 @@ func NewMetrics(config *Config) *Metrics {
 	if config == nil {
 		config = DefaultConfig()
 	}
-	
+
 	registry := prometheus.NewRegistry()
-	
+
 	m := &Metrics{
 		config:     config,
 		registry:   registry,
@@ -39,12 +39,12 @@ func NewMetrics(config *Config) *Metrics {
 		gauges:     make(map[string]*prometheus.GaugeVec),
 		histograms: make(map[string]*prometheus.HistogramVec),
 	}
-	
+
 	// Initialize HTTP metrics if enabled
 	if config.EnableHTTPMetrics {
 		m.initHTTPMetrics()
 	}
-	
+
 	return m
 }
 
@@ -104,7 +104,7 @@ func (m *Metrics) initHTTPMetrics() {
 			},
 		),
 	}
-	
+
 	// Register HTTP metrics
 	m.registry.MustRegister(
 		m.httpMetrics.RequestsTotal,
@@ -154,11 +154,11 @@ func (m *Metrics) RecordHistogram(name string, value float64, labels MetricLabel
 func (m *Metrics) getOrCreateCounter(name string, labelKeys []string) *prometheus.CounterVec {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	
+
 	if counter, exists := m.counters[name]; exists {
 		return counter
 	}
-	
+
 	counter := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Namespace:   m.config.Namespace,
@@ -169,10 +169,10 @@ func (m *Metrics) getOrCreateCounter(name string, labelKeys []string) *prometheu
 		},
 		labelKeys,
 	)
-	
+
 	m.registry.MustRegister(counter)
 	m.counters[name] = counter
-	
+
 	return counter
 }
 
@@ -180,11 +180,11 @@ func (m *Metrics) getOrCreateCounter(name string, labelKeys []string) *prometheu
 func (m *Metrics) getOrCreateGauge(name string, labelKeys []string) *prometheus.GaugeVec {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	
+
 	if gauge, exists := m.gauges[name]; exists {
 		return gauge
 	}
-	
+
 	gauge := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace:   m.config.Namespace,
@@ -195,10 +195,10 @@ func (m *Metrics) getOrCreateGauge(name string, labelKeys []string) *prometheus.
 		},
 		labelKeys,
 	)
-	
+
 	m.registry.MustRegister(gauge)
 	m.gauges[name] = gauge
-	
+
 	return gauge
 }
 
@@ -206,11 +206,11 @@ func (m *Metrics) getOrCreateGauge(name string, labelKeys []string) *prometheus.
 func (m *Metrics) getOrCreateHistogram(name string, labelKeys []string) *prometheus.HistogramVec {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	
+
 	if histogram, exists := m.histograms[name]; exists {
 		return histogram
 	}
-	
+
 	histogram := prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Namespace:   m.config.Namespace,
@@ -222,10 +222,10 @@ func (m *Metrics) getOrCreateHistogram(name string, labelKeys []string) *prometh
 		},
 		labelKeys,
 	)
-	
+
 	m.registry.MustRegister(histogram)
 	m.histograms[name] = histogram
-	
+
 	return histogram
 }
 
@@ -246,7 +246,7 @@ func getLabelKeys(labels MetricLabels) []string {
 	if labels == nil {
 		return []string{}
 	}
-	
+
 	keys := make([]string, 0, len(labels))
 	for k := range labels {
 		keys = append(keys, k)
