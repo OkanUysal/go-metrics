@@ -2,15 +2,32 @@ package metrics
 
 import (
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-var registered bool
+var (
+	setupOnce sync.Once
+	setupDone bool
+)
+
+// Setup registers metrics and health endpoints on the Gin router
+// Call this before adding your routes
+func (m *Metrics) Setup(router *gin.Engine) {
+	setupOnce.Do(func() {
+		if m.config.EnableMetricsEndpoint {
+			router.GET("/metrics", m.MetricsEndpoint())
+		}
+		if m.config.EnableHealthEndpoint {
+			router.GET("/health", m.HealthEndpoint())
+		}
+		setupDone = true
+	})
+}
 
 // GinMiddleware returns a Gin middleware for automatic metrics collection
-// It also auto-registers /metrics and /health endpoints if enabled in config
 func (m *Metrics) GinMiddleware() gin.HandlerFunc {
 	if !m.config.EnableHTTPMetrics {
 		// Return a no-op middleware if HTTP metrics are disabled
@@ -20,17 +37,6 @@ func (m *Metrics) GinMiddleware() gin.HandlerFunc {
 	}
 
 	return func(c *gin.Context) {
-		// Auto-register endpoints on first request
-		if !registered {
-			registered = true
-			if m.config.EnableMetricsEndpoint {
-				c.Engine().GET("/metrics", m.MetricsEndpoint())
-			}
-			if m.config.EnableHealthEndpoint {
-				c.Engine().GET("/health", m.HealthEndpoint())
-			}
-		}
-
 		// Skip metrics endpoint itself
 		if c.Request.URL.Path == "/metrics" || c.Request.URL.Path == "/health" {
 			c.Next()
