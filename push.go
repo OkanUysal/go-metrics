@@ -55,17 +55,17 @@ func (m *Metrics) pushToGrafana() error {
 	}
 
 	// Convert to Prometheus remote write format
-	var timeseries []*prompb.TimeSeries
+	var timeseries []prompb.TimeSeries
 	now := time.Now().UnixMilli()
 
 	for _, mf := range metricFamilies {
 		for _, metric := range mf.GetMetric() {
 			// Create labels
-			labels := []*prompb.Label{
+			labels := []prompb.Label{
 				{Name: "__name__", Value: mf.GetName()},
 			}
 			for _, label := range metric.GetLabel() {
-				labels = append(labels, &prompb.Label{
+				labels = append(labels, prompb.Label{
 					Name:  label.GetName(),
 					Value: label.GetValue(),
 				})
@@ -92,9 +92,9 @@ func (m *Metrics) pushToGrafana() error {
 				}
 			}
 
-			timeseries = append(timeseries, &prompb.TimeSeries{
+			timeseries = append(timeseries, prompb.TimeSeries{
 				Labels: labels,
-				Samples: []*prompb.Sample{
+				Samples: []prompb.Sample{
 					{
 						Value:     value,
 						Timestamp: now,
