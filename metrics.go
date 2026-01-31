@@ -28,6 +28,27 @@ type Metrics struct {
 func NewMetrics(config *Config) *Metrics {
 	if config == nil {
 		config = DefaultConfig()
+	} else {
+		// Apply defaults for unset fields
+		if config.Namespace == "" {
+			config.Namespace = "app"
+		}
+		if config.HTTPBuckets == nil {
+			config.HTTPBuckets = []float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10}
+		}
+		if config.PushInterval == 0 {
+			config.PushInterval = 15 * time.Second
+		}
+		// Enable by default if not explicitly set
+		if !config.EnableHTTPMetrics && config.ServiceName != "" {
+			config.EnableHTTPMetrics = true
+		}
+		if !config.EnableMetricsEndpoint && config.ServiceName != "" {
+			config.EnableMetricsEndpoint = true
+		}
+		if !config.EnableHealthEndpoint && config.ServiceName != "" {
+			config.EnableHealthEndpoint = true
+		}
 	}
 
 	registry := prometheus.NewRegistry()
