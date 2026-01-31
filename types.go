@@ -13,8 +13,10 @@ type Config struct {
 	Subsystem   string // Prometheus subsystem (optional)
 
 	// HTTP metrics configuration
-	EnableHTTPMetrics bool
-	HTTPBuckets       []float64 // Custom histogram buckets for HTTP duration
+	EnableHTTPMetrics     bool
+	HTTPBuckets           []float64 // Custom histogram buckets for HTTP duration
+	EnableMetricsEndpoint bool      // Auto-register /metrics endpoint
+	EnableHealthEndpoint  bool      // Auto-register /health endpoint
 
 	// Push gateway configuration (optional)
 	PushGatewayURL string
@@ -32,12 +34,14 @@ type Config struct {
 // DefaultConfig returns default configuration
 func DefaultConfig() *Config {
 	return &Config{
-		ServiceName:       "app",
-		Namespace:         "app",
-		EnableHTTPMetrics: true,
-		HTTPBuckets:       []float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10},
-		PushInterval:      15 * time.Second,
-		ConstLabels:       prometheus.Labels{},
+		ServiceName:           "app",
+		Namespace:             "app",
+		EnableHTTPMetrics:     true,
+		EnableMetricsEndpoint: true,
+		EnableHealthEndpoint:  true,
+		HTTPBuckets:           []float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10},
+		PushInterval:          15 * time.Second,
+		ConstLabels:           prometheus.Labels{},
 	}
 }
 
