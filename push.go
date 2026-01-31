@@ -69,7 +69,7 @@ func (m *Metrics) pushToGrafana() error {
 	}
 
 	// Set headers
-	req.Header.Set("Content-Type", string(expfmt.TypeTextPlain))
+	req.Header.Set("Content-Type", "application/openmetrics-text; version=1.0.0; charset=utf-8")
 	req.Header.Set("User-Agent", "go-metrics/1.0")
 	
 	// Set basic auth
