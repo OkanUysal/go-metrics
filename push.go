@@ -54,7 +54,7 @@ func (m *Metrics) pushToGrafana() error {
 
 	// Encode metrics in Prometheus text format
 	var buf bytes.Buffer
-	encoder := expfmt.NewEncoder(&buf, expfmt.FmtText)
+	encoder := expfmt.NewEncoder(&buf, expfmt.NewFormat(expfmt.TypeTextPlain))
 	
 	for _, mf := range metricFamilies {
 		if err := encoder.Encode(mf); err != nil {
@@ -69,7 +69,7 @@ func (m *Metrics) pushToGrafana() error {
 	}
 
 	// Set headers
-	req.Header.Set("Content-Type", string(expfmt.FmtText))
+	req.Header.Set("Content-Type", string(expfmt.TypeTextPlain))
 	req.Header.Set("User-Agent", "go-metrics/1.0")
 	
 	// Set basic auth
