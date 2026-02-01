@@ -56,6 +56,50 @@ func main() {
 
 Now visit `http://localhost:8080/metrics` to see Prometheus metrics!
 
+## Grafana Cloud Integration (Auto-Push)
+
+The library automatically pushes metrics to Grafana Cloud when you set environment variables. No additional code needed!
+
+### Setup
+
+1. **Get Grafana Cloud credentials** (free tier: 10K series, 50GB logs):
+   - Sign up at [grafana.com](https://grafana.com)
+   - Go to **My Account** → **Cloud Portal** → Your Stack → **Details**
+   - Under **Prometheus**:
+     - Copy **Remote Write Endpoint** (URL)
+     - Copy **Username/Instance ID** (User)
+     - Click **Generate now** for API key
+
+2. **Set environment variables**:
+   ```bash
+   export GRAFANA_CLOUD_URL="https://prometheus-prod-XX-prod-XX-X.grafana.net/api/prom/push"
+   export GRAFANA_CLOUD_USER="123456"
+   export GRAFANA_CLOUD_KEY="glc_xxxxx..."
+   ```
+
+3. **That's it!** Just create metrics normally:
+   ```go
+   m := metrics.NewMetrics(&metrics.Config{
+       ServiceName: "your-app",
+   })
+   // Metrics automatically pushed every 15 seconds
+   ```
+
+### Viewing Metrics in Grafana
+
+1. Go to Grafana Cloud → **Explore**
+2. Select **Prometheus** data source
+3. Query: `{service="your-app"}` or `http_requests_total`
+4. Create dashboards with queries like:
+   ```promql
+   rate(http_requests_total[5m])  # Request rate
+   histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))  # p95 latency
+   ```
+
+### Railway Deployment
+
+Just add the environment variables in Railway dashboard → Your service → **Variables**. Metrics will be pushed automatically when deployed.
+
 ## HTTP Metrics (Automatic)
 
 When you use `m.Middleware()`, these metrics are automatically collected:

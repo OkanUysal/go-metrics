@@ -3,6 +3,7 @@ package metrics
 import (
 	"context"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -50,6 +51,15 @@ func NewMetrics(config *Config) *Metrics {
 		}
 		if !config.EnableHealthEndpoint && config.ServiceName != "" {
 			config.EnableHealthEndpoint = true
+		}
+		
+		// Auto-configure Grafana Cloud from environment variables
+		if config.GrafanaCloudURL == "" {
+			if url := os.Getenv("GRAFANA_CLOUD_URL"); url != "" {
+				config.GrafanaCloudURL = url
+				config.GrafanaCloudUser = os.Getenv("GRAFANA_CLOUD_USER")
+				config.GrafanaCloudAPIKey = os.Getenv("GRAFANA_CLOUD_KEY")
+			}
 		}
 	}
 

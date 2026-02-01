@@ -129,7 +129,7 @@ func (m *Metrics) pushToGrafana() error {
 	req.Header.Set("Content-Type", "application/x-protobuf")
 	req.Header.Set("X-Prometheus-Remote-Write-Version", "0.1.0")
 	req.Header.Set("User-Agent", "go-metrics/1.0")
-	
+
 	// Set basic auth
 	req.SetBasicAuth(m.config.GrafanaCloudUser, m.config.GrafanaCloudAPIKey)
 
